@@ -1,0 +1,358 @@
+@page "/pong"
+@using Games.Client.Model;
+@using System.Threading;
+
+<div class="score-panel" @onkeydown="@KeyPressed">
+    <h1>Blazing Plong</h1>
+    <div>&copy; Linda Lawton 2019</div>
+
+
+
+
+    Difficulty :<select id="difficulty" @onchange="@SetDifficulty">
+        <option value="1">Easy</option>
+        <option value="2">Medium</option>
+        <option value="3">Hard</option>
+    </select>
+
+    <Score left="@ScoreLeft" right="@ScoreRight"></Score>
+    <svg width="600" height="400" bor>
+        <rect width="@GameWidth" height="@GameHeight" style="fill:rgb(220,220,220);stroke-width:3;stroke:rgb(0,0,0)" />
+        <Paddle Width="@Left.Width" Height="@Left.Height" Style="@Left.Style" CurrentPosition="@Left.CurrentPosition"></Paddle>
+        <Paddle Width="@Right.Width" Height="@Right.Height" Style="@Right.Style" CurrentPosition="@Right.CurrentPosition"></Paddle>
+        <Ball  CurrentPosition="@Ball.CurrentPosition"></Ball>
+    </svg>
+
+    <button class="btn btn-primary" @onclick="@BtnPause" autofocus>@PauseGameLabel</button>
+    <button class="btn btn-primary" @onclick="@BtnUp" autofocus>Up</button>
+    <button class="btn btn-primary" @onclick="@BtnDown" autofocus>Down</button>
+    <button class="btn btn-primary" @onclick="@BtnSwapPaddle" autofocus>Swap Paddles</button>
+
+    <button class="btn btn-primary" @onclick="@NewGame" autofocus>New Game</button>
+
+    <button class="btn btn-primary" @onclick="@Bounce" autofocus>bounce</button>
+    @*<button class="btn btn-primary" @onclick="@RunGame" autofocus>RunGame</button>*@
+</div>
+
+
+@code {
+
+int GameHeight = 400;
+int GameWidth = 600;
+Ball Ball;
+Paddle Left;
+Paddle Right;
+Paddle Active;
+int ScoreLeft = 0;
+int ScoreRight = 0;
+int HighScore = 0;
+int Speed = 2;
+int InitialDelay = 0;
+bool PauseGame = false;
+string PauseGameLabel = "pause";
+
+
+internal async Task KeyPressed(UIKeyboardEventArgs args)
+{
+    //LastKeyPress = args.Code;
+    //await ProcessKeyEvent(args);
+
+    int i = 1;
+}
+
+protected override async Task OnInitAsync()
+{
+    Left = new Paddle();
+    Left.Location = "Left";
+    Right = new Paddle();
+    Right.Location = "Right";
+    Ball = new Ball();
+    NewGame();
+    RunGame();
+}
+
+
+protected void Refresh()
+{
+    StateHasChanged();
+}
+
+private async Task RunGame()
+{
+    bool IsPaused = false;
+
+    try
+    {
+        do
+        {
+            if (!IsPaused)
+            {
+                Ball.PreviousPosition = new Point(Ball.CurrentPosition.X, Ball.CurrentPosition.Y);
+                Ball.CurrentPosition = new Point(Ball.NextPosition.X, Ball.NextPosition.Y);
+
+
+
+                //if (Ball.CurrentPosition.X < GameWidth / 2)
+                //{
+                //    // Left paddle
+                //    Active = Left;
+                //    Right.SetInActive();
+                //    Active.SetActive();
+                //}
+                //else if (Ball.CurrentPosition.X > GameWidth / 2)
+                //{
+                //    // Right Paddle
+                //    Active = Right;
+                //    Left.SetInActive();
+                //    Active.SetActive();
+
+                //}
+
+                var nextPoint = new Point(0, 0);
+
+                if (Balldirections.Plus.Equals(Ball.IncreaseX()))
+                {
+                    var pos = Ball.CurrentPosition.X + Speed;
+
+                    if (pos >= GameWidth)
+                    {
+                        // Hit Right Wall
+                        pos = Ball.CurrentPosition.X - Speed;
+                        IncrmentScore();
+
+                    }
+                    else if (Active.IsPaddle(pos, Ball.CurrentPosition.Y))
+                    {
+                        Speed++;
+                        pos = Ball.CurrentPosition.X - Speed;
+                    }
+
+                    nextPoint.X = pos;
+
+                    // Right paddle
+                    Active = Right;
+                    Left.SetInActive();
+                    Active.SetActive();
+                }
+                else if (Balldirections.Minus.Equals(Ball.IncreaseX()))
+                {
+                    var pos = Ball.CurrentPosition.X - Speed;
+
+                    if (pos <= 0)
+                    {
+                        // Hit left wall
+                        pos = Ball.CurrentPosition.X + Speed;
+                        IncrmentScore();
+                    }
+                    else if (Active.IsPaddle(pos, Ball.CurrentPosition.Y))
+                    {
+                        pos = Ball.CurrentPosition.X + Speed;
+                        Speed++;
+                    }
+
+                    nextPoint.X = pos;
+
+                    // Left Paddle
+                    Active = Left;
+                    Right.SetInActive();
+                    Active.SetActive();
+                }
+                else
+                    nextPoint.X = Ball.CurrentPosition.X;
+
+
+                if (Balldirections.Plus.Equals(Ball.IncreaseY()))
+                {
+                    var pos = Ball.CurrentPosition.Y + Speed;
+
+                    if (pos >= GameHeight)
+                        pos = Ball.CurrentPosition.Y - Speed;
+
+                    nextPoint.Y = pos;
+                }
+                else if (Balldirections.Minus.Equals(Ball.IncreaseY()))
+                {
+                    var pos = Ball.CurrentPosition.Y - Speed;
+
+                    if (pos <= 0)
+                        pos = Ball.CurrentPosition.Y + Speed;
+
+                    nextPoint.Y = pos;
+                }
+                else
+                    nextPoint.Y = Ball.CurrentPosition.Y;
+
+
+                Ball.NextPosition = nextPoint;
+
+                Refresh();
+                await Task.Delay(1);
+            }
+            else
+            {
+                await Task.Delay(100);  // Stop game
+            }
+
+        } while (true);
+
+
+        //SetGameOver();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine();
+        Console.WriteLine("******** GAME LOOP ERROR **********");
+        Console.WriteLine(ex);
+        throw;
+    }
+}
+
+void IncrmentScore()
+{
+    if (Active.Location == "Left")
+        ScoreRight++;
+
+    else
+        ScoreLeft++;
+
+}
+
+bool IsPaddle(Point point)
+{
+
+    if (point.X < GameWidth / 2)
+    {
+        // Left paddle
+
+    }
+    else if (point.X > GameWidth / 2)
+    {
+        // Right Paddle
+
+    }
+
+
+
+    return false;
+
+}
+
+bool OutOfBounds(Point point, int ballRadius)
+{
+
+    if ((point.X - ballRadius) <= 0 || (point.X + ballRadius) >= GameWidth)
+        return false;
+    else if ((point.Y - ballRadius) <= 0 || (point.Y + ballRadius) >= GameHeight)
+        return false;
+
+    return true;
+
+}
+
+void Bounce()
+{
+    for (int i = 0; i < 1000; i++)
+    {
+        Ball.CurrentPosition.Y++;
+        Task.Run(() => SetPosition(Ball.CurrentPosition.X, Ball.CurrentPosition.Y, GameHeight));
+
+    }
+}
+
+public async Task<bool> SetPosition(int x, int y, int LastRow)
+{
+
+    //if (y <= (LastRow - Ball.Height))
+    //{
+    //    Ball.CurrentPosition.Y = y;
+    //    Ball.CurrentPosition.X = x;
+    //    StateHasChanged();
+    //    await Task.Delay(1000);
+    //    return true;
+    //}
+
+    return false;
+
+}
+
+void NewGame()
+{
+
+    Left.CurrentPosition = new Point(25, (GameHeight / 2) - (Left.Height / 2));
+    Right.CurrentPosition = new Point(550, (GameHeight / 2) - (Right.Height / 2));
+    Active = Left;
+
+    Ball.CurrentPosition = new Point(GameWidth / 2, GameHeight / 2);
+    Ball.PreviousPosition = new Point(Ball.CurrentPosition.X, GameHeight / 2);
+    Ball.NextPosition = new Point(Ball.CurrentPosition.X - Speed, GameHeight / 2 + Speed);
+
+}
+
+void BtnSwapPaddle()
+{
+
+    if (Active.Location == "Left")
+        Active = Right;
+    else
+        Active = Left;
+}
+
+void BtnUp()
+{
+
+    var newY = Active.CurrentPosition.Y - 20;
+
+    if (newY >= 0)
+        Active.CurrentPosition.Y = newY;
+
+    // StateHasChanged();
+
+}
+
+void BtnDown()
+{
+    var newY = Active.CurrentPosition.Y + 20;
+
+    if (newY <= GameHeight - Active.Height)
+        Active.CurrentPosition.Y = newY;
+}
+
+void BtnPause()
+{
+
+    IncreaseSpeed();
+
+    Left.CurrentPosition.X++; ;
+    Left.CurrentPosition.Y++;
+    StateHasChanged();
+
+}
+
+void SetDifficulty(UIChangeEventArgs e)
+{
+    var value = Int32.Parse(e.Value.ToString());
+    if (value == 1) SetSpeed(1);
+    else if (value == 2) SetSpeed(5);
+    else if (value == 3) SetSpeed(10);
+}
+
+
+
+
+void SetSpeed(int value = 1)
+{
+    Speed = value;
+
+}
+void IncreaseSpeed(int value = 1)
+{
+    Speed = Speed + value;
+
+}
+
+    @*internal async Task KeyPressed(UIKeyboardEventArgs args)
+           {
+               LastKeyPress = args.Code;
+               await ActivePiece.ProcessKeyEvent(args);
+        }*@
+}

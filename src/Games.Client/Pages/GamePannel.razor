@@ -1,0 +1,306 @@
+@inherits GamePannelModel;
+@using Games.Client.Model
+
+
+<div @onkeydown="@KeyPressed" tabindex="0">
+    <svg width="@Width" height="@Height">
+        <rect width="@Width" height="@Height" style="@Style" />
+
+        @foreach (var paddle in @Paddles)
+        {
+            <Paddle Width="@paddle.Width" Height="@paddle.Height" Style="@paddle.Style" CurrentPosition="@paddle.CurrentPosition"></Paddle>
+        }
+        @foreach (var ball in @Balls)
+        {
+            <Ball CurrentPosition="@ball.CurrentPosition"></Ball>
+        }
+    </svg>
+
+    <br />
+
+    <label>Paddle is moving: @Active.IsMoving()</label><br />
+    <label>Ball speed: @Balls.FirstOrDefault().Speed</label><br />
+    <button class="btn btn-primary" @onclick="@BtnStart" autofocus>@StartPauseButtonLabel</button>
+
+</div>
+
+@code {
+
+    string StartPauseButtonLabel = "Start";
+
+    bool IsPaused = true;
+
+    int NumberOfPlayers = 0;
+
+    internal string LastKeyPress;
+
+    public void BtnCheck()
+    {
+
+        var myObject = new Point(10, 10);
+        var width = 10;
+        var height = 20;
+
+        var testPos = new Point(20, 21);
+
+        if (((myObject.X <= testPos.X) && (myObject.X + width >= testPos.X) && (myObject.Y <= testPos.Y) && (myObject.Y + height >= testPos.Y)))
+        {
+            int i = 1;
+        }
+
+
+        int k = 1;
+
+    }
+
+    public void BtnStart()
+    {
+        StartPauseButtonLabel = (StartPauseButtonLabel == "Start") ? "Pause" : "Start";
+        IsPaused = (IsPaused) ? false : true;
+        RunGame();
+    }
+
+    protected void Refresh()
+    {
+        StateHasChanged();
+    }
+
+
+    private async Task RunGame()
+    {
+
+
+        try
+        {
+            do
+            {
+                if (!IsPaused)
+                {
+                    foreach (var ball in @Balls)
+                    {
+
+
+
+                        var ballPredictedNextMovementsDic = ball.GetNextMovement();
+
+                        ball.PreviousPosition = ballPredictedNextMovementsDic.FirstOrDefault(pos => pos.Key.Equals("prevous")).Value;
+                        ball.CurrentPosition = ballPredictedNextMovementsDic.FirstOrDefault(pos => pos.Key.Equals("current")).Value;
+
+
+                        if (NumberOfPlayers == 0)
+                        {
+
+                            AI();
+                        }
+
+                        // Validate Next Pos
+                        var nextPos = ballPredictedNextMovementsDic.FirstOrDefault(pos => pos.Key.Equals("next")).Value;
+
+                        var nextPoint = new Point(0, 0);
+
+                        // Validate X
+
+                        if (Balldirections.Plus.Equals(ball.IncreaseX()))
+                        {
+                            var pos = nextPos.X;
+
+                            if (pos >= Width)
+                            {
+                                // Hit Right Wall
+                                pos = ball.CurrentPosition.X - ball.Speed;
+                                //IncrmentScore();
+
+                            }
+                            else if (Active.IsPaddleNew(pos, ball.CurrentPosition.Y))
+                            {
+                                ChangeBallSpeed(ball);
+
+                                pos = ball.CurrentPosition.X - ball.Speed;
+                            }
+
+                            nextPoint.X = pos;
+                        }
+                        else if (Balldirections.Minus.Equals(ball.IncreaseX()))
+                        {
+                            var pos = nextPos.X;
+
+                            if (pos <= 0)
+                            {
+                                // Hit left wall
+                                pos = ball.CurrentPosition.X + ball.Speed;
+                                //IncrmentScore();
+                            }
+                            else if (Active.IsPaddleNew(pos, ball.CurrentPosition.Y))
+                            {
+                                ChangeBallSpeed(ball);
+                                pos = ball.CurrentPosition.X - ball.Speed;
+                            }
+
+                            nextPoint.X = pos;
+
+
+                        }
+                        else
+                            nextPoint.X = nextPos.X;
+
+
+                        // Validate Y
+
+                        if (Balldirections.Plus.Equals(ball.IncreaseY()))
+                        {
+                            var pos = nextPos.Y;
+
+                            if (pos >= Height)  // Ball hit bottom
+                                pos = ball.CurrentPosition.Y - ball.Speed;
+                            else if (Active.IsPaddleNew(ball.CurrentPosition.X, pos)) // Ball Hit Paddle
+                            {
+                                ChangeBallSpeed(ball);
+
+                                pos = ball.CurrentPosition.Y - ball.Speed;
+                            }
+
+                            nextPoint.Y = pos;
+                        }
+                        else if (Balldirections.Minus.Equals(ball.IncreaseY()))
+                        {
+                            var pos = nextPos.Y;
+
+                            if (pos <= 0)  // Ball hit top
+                                pos = ball.CurrentPosition.Y + ball.Speed;
+                            else if (Active.IsPaddleNew(ball.CurrentPosition.X, pos)) // Ball hit paddle
+                            {
+                                ChangeBallSpeed(ball);
+                                pos = ball.CurrentPosition.Y - ball.Speed;
+                            }
+
+                            nextPoint.Y = pos;
+                        }
+                        else
+                            nextPoint.Y = ball.CurrentPosition.Y;
+
+
+                        ball.NextPosition = nextPoint;
+
+
+
+                        Refresh();
+                        await Task.Delay(1);
+                    }
+
+
+
+
+
+
+                }
+                else
+
+                {
+                    await Task.Delay(100);  // Stop game
+                }
+
+
+            } while (true);
+
+
+            //SetGameOver();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine();
+            Console.WriteLine("******** GAME LOOP ERROR **********");
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
+    void ChangeBallSpeed(Ball ball)
+    {
+
+        if (Active.IsMoving())
+        {
+            if (ball.Speed < 10)
+                ball.Speed++;
+        }
+        else if (ball.Speed > 5)
+            ball.Speed--;
+    }
+
+    public void AI()
+    {
+
+        // Find lowest
+        var lowest = Balls.OrderByDescending(y => y.CurrentPosition.Y).First();
+
+        var pos = lowest.CurrentPosition.X;
+        var start = Active.CurrentPosition.X;
+        var end = Active.CurrentPosition.X + Active.Width;
+
+        if (pos < start)
+            MovePaddleLeft();
+        else if (pos > end)
+            MovePaddleRight();
+
+    }
+
+
+    internal async Task KeyPressed(UIKeyboardEventArgs args)
+    {
+        LastKeyPress = args.Code;
+        await ProcessKeyEvent(args);
+    }
+
+    public async Task<bool>
+        ProcessKeyEvent(UIKeyboardEventArgs args)
+    {
+        await KeyHandler(args);
+        return true;
+    }
+    protected async Task<bool>
+        KeyHandler(UIKeyboardEventArgs args)
+    {
+        try
+        {
+            int dx = 0;
+            switch (args.Key)
+            {
+                case "ArrowLeft":
+                case "A":
+                case "a":
+                    MovePaddleLeft();
+                    break;
+                case "ArrowRight":
+                case "D":
+                case "d":
+                    MovePaddleRight();
+                    break;
+                case "ArrowUp":
+                case "W":
+                case "w":
+                    MovePaddleUp();
+                    break;
+                case "ArrowDown":
+                case "S":
+                case "s":
+                    MovePaddleDown();
+                    break;
+                default:
+                    Console.WriteLine($"Key {args.Key} Code {args.Code}");
+                    break;
+            };
+
+
+            return true;
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine();
+            Console.WriteLine("******** MOVEMENT ERROR **********");
+            Console.WriteLine(ex);
+            throw;
+        }
+        return false;
+    }
+
+}
