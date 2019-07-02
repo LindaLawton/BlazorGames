@@ -18,14 +18,17 @@ namespace Games.Client.Model
         [Parameter]
         public string Style { get; set; }
 
+        //[Parameter]
+        //public List<Paddle> Paddles { get; set; }
+
         [Parameter]
-        public List<Paddle> Paddles { get; set; }
+        public List<Player> Players { get; set; }
 
         [Parameter]
         public List<Ball> Balls { get; set; }  // fix issue with game with no balls.
 
         [Parameter]
-        public Paddle Active { get; set; }  //TODO fix null issue for game with no paddles
+        public Player Active { get; set; }  //TODO fix null issue for game with no paddles
 
         [Parameter] public Action StartGameParentMethod { get; set; }
 
@@ -37,17 +40,17 @@ namespace Games.Client.Model
         public GamePannelModel()
         {
             Style = "fill:rgb(220,220,220);stroke-width:3;stroke:rgb(0,0,0)";
-            Paddles = new List<Paddle>();
+            Players = new List<Player>();
             Balls = new List<Ball>();
         }
 
-        public void AddPaddle(int height, int width, int speed, string style, Point currentPosition, PaddleMovment paddleMovment, bool active = true)
-        {
-            Paddles.Add(new Paddle() { Height = height, Width = width, Style = style, Speed = speed, CurrentPosition = currentPosition, PaddleMovment = paddleMovment });
+        //public void AddPaddle(int height, int width, int speed, string style, Point currentPosition, PaddleMovment paddleMovment, bool active = true)
+        //{
+        //    Paddles.Add(new Paddle() { Height = height, Width = width, Style = style, Speed = speed, CurrentPosition = currentPosition, PaddleMovment = paddleMovment });
 
-            if (active)
-                Active = Paddles.FirstOrDefault(p => p.Height.Equals(height) && p.Width.Equals(width) && p.Speed.Equals(speed) && p.Style.Equals(style) && p.CurrentPosition.Equals(currentPosition));
-        }
+        //    if (active)
+        //        Active = Paddles.FirstOrDefault(p => p.Height.Equals(height) && p.Width.Equals(width) && p.Speed.Equals(speed) && p.Style.Equals(style) && p.CurrentPosition.Equals(currentPosition));
+        //}
 
         public void AddBall(int radius, int speed, string style, Point currentPosition, Point nextPosition, Point previousPosition = null)
         {
@@ -56,37 +59,37 @@ namespace Games.Client.Model
 
         public void MovePaddleLeft()
         {
-            var pos = Active.GetNextLeftPoint();
+            var pos = Active.Paddles.First().GetNextLeftPoint();
 
             if (IsOnScreen(pos))
-                Active.CurrentPosition = pos;
+                Active.Paddles.First().CurrentPosition = pos;
 
         }
         public void MovePaddleRight()
         {
-            var pos = Active.GetNextRightPoint();
+            var pos = Active.Paddles.First().GetNextRightPoint();
             if (IsOnScreen(pos))
-                Active.CurrentPosition = pos;
+                Active.Paddles.First().CurrentPosition = pos;
         }
 
         public void MovePaddleUp()
         {
-            var pos = Active.GetNextUpPoint();
+            var pos = Active.Paddles.First().GetNextUpPoint();
             if (IsOnScreen(pos))
-                Active.CurrentPosition = pos;
+                Active.Paddles.First().CurrentPosition = pos;
         }
         public void MovePaddleDown()
         {
-            var pos = Active.GetNextDownPoint();
+            var pos = Active.Paddles.First().GetNextDownPoint();
             if (IsOnScreen(pos))
-                Active.CurrentPosition = pos;
+                Active.Paddles.First().CurrentPosition = pos;
         }
 
         private bool IsOnScreen(Point pos)
         {
-            if (pos.X <= 0 || pos.X + Active.Width >= Width)
+            if (pos.X <= 0 || pos.X + Active.Paddles.First().Width >= Width)
                 return false;
-            if (pos.Y <= 0 || pos.Y + Active.Height >= Height)
+            if (pos.Y <= 0 || pos.Y + Active.Paddles.First().Height >= Height)
                 return false;
 
 

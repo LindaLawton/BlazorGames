@@ -6,11 +6,13 @@
     <svg width="@Width" height="@Height">
         <rect width="@Width" height="@Height" style="@Style" />
 
-        @foreach (var paddle in @Paddles)
+        @foreach (var player in @Players)
         {
-            <Paddle Width="@paddle.Width" Height="@paddle.Height" Style="@paddle.Style" CurrentPosition="@paddle.CurrentPosition"></Paddle>
+            @foreach (var paddle in player.Paddles)
+             {
+                 <Paddle Width="@paddle.Width" Height="@paddle.Height" Style="@paddle.Style" CurrentPosition="@paddle.CurrentPosition"></Paddle>
+             }
         }
-
 
         @foreach (var ball in @Balls)  //todo: figuer out why this pukes on list of 0
         {
@@ -21,7 +23,7 @@
 
     <br />
 
-    <label>Paddle is moving: @Active.IsMoving()</label><br />
+    <label>Paddle is moving: @Active.Paddles.First().IsMoving()</label><br />
     <label>Ball speed: @Balls.FirstOrDefault().Speed</label><br />
     <button class="btn btn-primary" @onclick="@BtnStart" autofocus>@StartPauseButtonLabel</button>
 
@@ -99,7 +101,7 @@
                                 //IncrmentScore();
 
                             }
-                            else if (Active.IsPaddleNew(pos, ball.CurrentPosition.Y))
+                            else if (Active.Paddles.First().IsPaddleNew(pos, ball.CurrentPosition.Y))
                             {
                                 ChangeBallSpeed(ball);
 
@@ -118,7 +120,7 @@
                                 pos = ball.CurrentPosition.X + ball.Speed;
                                 //IncrmentScore();
                             }
-                            else if (Active.IsPaddleNew(pos, ball.CurrentPosition.Y))
+                            else if (Active.Paddles.First().IsPaddleNew(pos, ball.CurrentPosition.Y))
                             {
                                 ChangeBallSpeed(ball);
                                 pos = ball.CurrentPosition.X - ball.Speed;
@@ -140,7 +142,7 @@
 
                             if (pos >= Height)  // Ball hit bottom
                                 pos = ball.CurrentPosition.Y - ball.Speed;
-                            else if (Active.IsPaddleNew(ball.CurrentPosition.X, pos)) // Ball Hit Paddle
+                            else if (Active.Paddles.First().IsPaddleNew(ball.CurrentPosition.X, pos)) // Ball Hit Paddle
                             {
                                 ChangeBallSpeed(ball);
 
@@ -155,7 +157,7 @@
 
                             if (pos <= 0)  // Ball hit top
                                 pos = ball.CurrentPosition.Y + ball.Speed;
-                            else if (Active.IsPaddleNew(ball.CurrentPosition.X, pos)) // Ball hit paddle
+                            else if (Active.Paddles.First().IsPaddleNew(ball.CurrentPosition.X, pos)) // Ball hit paddle
                             {
                                 ChangeBallSpeed(ball);
                                 pos = ball.CurrentPosition.Y - ball.Speed;
@@ -205,7 +207,7 @@
     void ChangeBallSpeed(Ball ball)
     {
 
-        if (Active.IsMoving())
+        if (Active.Paddles.First().IsMoving())
         {
             if (ball.Speed < 10)
                 ball.Speed++;
@@ -221,8 +223,8 @@
         var lowest = Balls.OrderByDescending(y => y.CurrentPosition.Y).First();
 
         var pos = lowest.CurrentPosition.X;
-        var start = Active.CurrentPosition.X;
-        var end = Active.CurrentPosition.X + Active.Width;
+        var start = Active.Paddles.First().CurrentPosition.X;
+        var end = Active.Paddles.First().CurrentPosition.X + Active.Paddles.First().Width;
 
         if (pos < start)
             MovePaddleLeft();

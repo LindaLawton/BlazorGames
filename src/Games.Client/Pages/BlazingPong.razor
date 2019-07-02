@@ -9,43 +9,43 @@
 <p>A pong style game created in Balzor</p>
 
 
-<GamePannel Width="@Game.Width" Height="@Game.Height" Paddles="@Game.Paddles" Balls="@Game.Balls" Active="@Game.Active" StartGameParentMethod="@btnStartGame"></GamePannel>
+<GamePannel Width="@Game.Width" Height="@Game.Height" Balls="@Game.Balls" Active="@Game.Active" StartGameParentMethod="@btnStartGame"></GamePannel>
 
 @code {
-    GamePannel Game;
-    int myPaddleHeight = 100;
-    int myPaddleWidth = 20;
-    int myPaddleSpeed = 10;
+GamePannel Game;
+int myPaddleHeight = 100;
+int myPaddleWidth = 20;
+int myPaddleSpeed = 10;
 
-    protected override async Task OnInitAsync()
-    {
-        Game = new GamePannel();
-        Game.Height = 400;
-        Game.Width = 600;
+protected override async Task OnInitAsync()
+{
+    Game = new GamePannel();
+    Game.Height = 400;
+    Game.Width = 600;
 
-        NewGame();
-    }
+    NewGame();
+}
 
-    private void NewGame()
-    {
+private void NewGame()
+{
 
-        Game.Balls = new List<Ball>();
-        Game.Paddles = new List<Paddle>();
-        Game.AddPaddle(myPaddleHeight, myPaddleWidth, myPaddleSpeed, "fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,0)", new Point(20, Game.Height / 2 - myPaddleHeight / 2), PaddleMovment.PaddleMovmentVirtical(), true);
+    //Game.Balls = new List<Ball>();
+    //var Paddles = new List<Paddle>();
+    //Paddles.AddPaddle(myPaddleHeight, myPaddleWidth, myPaddleSpeed, "fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,0)", new Point(20, Game.Height / 2 - myPaddleHeight / 2), PaddleMovment.PaddleMovmentVirtical(), true);
 
-        Game.AddPaddle(myPaddleHeight, myPaddleWidth, myPaddleSpeed, "fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,0)", new Point(550, Game.Height / 2 - myPaddleHeight / 2), PaddleMovment.PaddleMovmentVirtical(), true);
+    //Game.AddPaddle(myPaddleHeight, myPaddleWidth, myPaddleSpeed, "fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,0)", new Point(550, Game.Height / 2 - myPaddleHeight / 2), PaddleMovment.PaddleMovmentVirtical(), true);
 
-        Game.AddBall(5, 5, "fill:rgb(255,0,0);stroke-width:1;stroke:rgb(0,0,0)", new Point(50, 200), new Point(50 + 5, 200 + 5), new Point(55 - 5, 200 - 5));
+    //Game.AddBall(5, 5, "fill:rgb(255,0,0);stroke-width:1;stroke:rgb(0,0,0)", new Point(50, 200), new Point(50 + 5, 200 + 5), new Point(55 - 5, 200 - 5));
 
-        Game.Balls.First().HideBall();
-    }
+    //Game.Balls.First().HideBall();
+}
 
-    private void btnStartGame()
-    {
+private void btnStartGame()
+{
 
-        int i = 1;
+    int i = 1;
 
-    }
+}
 
 
 
