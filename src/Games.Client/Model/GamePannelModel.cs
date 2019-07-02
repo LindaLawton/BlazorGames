@@ -22,13 +22,17 @@ namespace Games.Client.Model
         public List<Paddle> Paddles { get; set; }
 
         [Parameter]
-        public List<Ball> Balls { get; set; }
+        public List<Ball> Balls { get; set; }  // fix issue with game with no balls.
 
         [Parameter]
-        public Paddle Active { get; set; }
-        
-       
+        public Paddle Active { get; set; }  //TODO fix null issue for game with no paddles
 
+        [Parameter] public Action StartGameParentMethod { get; set; }
+
+        public void InvokeStartGameParentMethod()
+        {
+            StartGameParentMethod?.Invoke();
+        }
 
         public GamePannelModel()
         {
@@ -37,12 +41,12 @@ namespace Games.Client.Model
             Balls = new List<Ball>();
         }
 
-        public void AddPaddle(int height, int width, int speed, string style, Point currentPosition, bool active = true)
+        public void AddPaddle(int height, int width, int speed, string style, Point currentPosition, PaddleMovment paddleMovment, bool active = true)
         {
-            Paddles.Add(new Paddle() { Height = height, Width = width, Style = style, Speed = speed,  CurrentPosition = currentPosition });
+            Paddles.Add(new Paddle() { Height = height, Width = width, Style = style, Speed = speed, CurrentPosition = currentPosition, PaddleMovment = paddleMovment });
 
             if (active)
-                Active = Paddles.FirstOrDefault(p => p.Height.Equals(height) && p.Width.Equals(width) &&  p.Speed.Equals(speed)  && p.Style.Equals(style) && p.CurrentPosition.Equals(currentPosition));
+                Active = Paddles.FirstOrDefault(p => p.Height.Equals(height) && p.Width.Equals(width) && p.Speed.Equals(speed) && p.Style.Equals(style) && p.CurrentPosition.Equals(currentPosition));
         }
 
         public void AddBall(int radius, int speed, string style, Point currentPosition, Point nextPosition, Point previousPosition = null)

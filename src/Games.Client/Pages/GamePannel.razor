@@ -10,10 +10,13 @@
         {
             <Paddle Width="@paddle.Width" Height="@paddle.Height" Style="@paddle.Style" CurrentPosition="@paddle.CurrentPosition"></Paddle>
         }
-        @foreach (var ball in @Balls)
+
+
+        @foreach (var ball in @Balls)  //todo: figuer out why this pukes on list of 0
         {
             <Ball CurrentPosition="@ball.CurrentPosition"></Ball>
         }
+
     </svg>
 
     <br />
@@ -21,6 +24,9 @@
     <label>Paddle is moving: @Active.IsMoving()</label><br />
     <label>Ball speed: @Balls.FirstOrDefault().Speed</label><br />
     <button class="btn btn-primary" @onclick="@BtnStart" autofocus>@StartPauseButtonLabel</button>
+
+
+    <button class="btn btn-primary" @onclick="@InvokeStartGameParentMethod" autofocus>@StartPauseButtonLabel - New</button>
 
 </div>
 
@@ -33,25 +39,7 @@
     int NumberOfPlayers = 0;
 
     internal string LastKeyPress;
-
-    public void BtnCheck()
-    {
-
-        var myObject = new Point(10, 10);
-        var width = 10;
-        var height = 20;
-
-        var testPos = new Point(20, 21);
-
-        if (((myObject.X <= testPos.X) && (myObject.X + width >= testPos.X) && (myObject.Y <= testPos.Y) && (myObject.Y + height >= testPos.Y)))
-        {
-            int i = 1;
-        }
-
-
-        int k = 1;
-
-    }
+   
 
     public void BtnStart()
     {

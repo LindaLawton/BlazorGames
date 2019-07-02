@@ -84,5 +84,10 @@ namespace Games.Client.Model
             Radius = 5;
 
         }
+
+        public void HideBall()
+        {
+            CurrentPosition = new Point(-Radius, -Radius);
+        }
     }
 }
