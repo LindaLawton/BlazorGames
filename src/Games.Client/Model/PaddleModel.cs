@@ -61,7 +61,7 @@ namespace Games.Client.Model
         [Parameter]
         public string Location { get; set; }
 
-        internal string Id;
+        
         [Parameter]
         public Point CurrentPosition { get; set; }
 
@@ -233,9 +233,7 @@ namespace Games.Client.Model
         }
 
 
-
-
-
+        
 
     }
 }

@@ -7,7 +7,21 @@ using Microsoft.AspNetCore.Components;
 
 namespace Games.Client.Model
 {
+
     public class GamePannelModel : ComponentBase
+    {
+
+        [Parameter]
+        public GameModel Game { get; set; }
+        [Parameter] public Action StartGameParentMethod { get; set; }
+
+        public void InvokeStartGameParentMethod()
+        {
+            StartGameParentMethod?.Invoke();
+        }
+    }
+
+    public class GameModel : ComponentBase
     {
 
         [Parameter]
@@ -22,7 +36,7 @@ namespace Games.Client.Model
         //public List<Paddle> Paddles { get; set; }
 
         [Parameter]
-        public List<Player> Players { get; set; }
+        public Dictionary<string, Player> Players { get; set; }
 
         [Parameter]
         public List<Ball> Balls { get; set; }  // fix issue with game with no balls.
@@ -30,17 +44,12 @@ namespace Games.Client.Model
         [Parameter]
         public Player Active { get; set; }  //TODO fix null issue for game with no paddles
 
-        [Parameter] public Action StartGameParentMethod { get; set; }
 
-        public void InvokeStartGameParentMethod()
-        {
-            StartGameParentMethod?.Invoke();
-        }
 
-        public GamePannelModel()
+        public GameModel()
         {
             Style = "fill:rgb(220,220,220);stroke-width:3;stroke:rgb(0,0,0)";
-            Players = new List<Player>();
+            Players = new Dictionary<string, Player>();
             Balls = new List<Ball>();
         }
 

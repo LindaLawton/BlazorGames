@@ -3,18 +3,18 @@
 
 
 <div @onkeydown="@KeyPressed" tabindex="0">
-    <svg width="@Width" height="@Height">
-        <rect width="@Width" height="@Height" style="@Style" />
+    <svg width="@Game.Width" height="@Game.Height">
+        <rect width="@Game.Width" height="@Game.Height" style="@Game.Style" />
 
-        @foreach (var player in @Players)
+        @foreach (var player in @Game.Players)
         {
-            @foreach (var paddle in player.Paddles)
-             {
-                 <Paddle Width="@paddle.Width" Height="@paddle.Height" Style="@paddle.Style" CurrentPosition="@paddle.CurrentPosition"></Paddle>
-             }
+            @foreach (var paddle in player.Value.Paddles)
+            {
+                <Paddle Width="@paddle.Width" Height="@paddle.Height" Style="@paddle.Style" CurrentPosition="@paddle.CurrentPosition"></Paddle>
+            }
         }
 
-        @foreach (var ball in @Balls)  //todo: figuer out why this pukes on list of 0
+        @foreach (var ball in @Game.Balls)  //todo: figuer out why this pukes on list of 0
         {
             <Ball CurrentPosition="@ball.CurrentPosition"></Ball>
         }
@@ -23,8 +23,8 @@
 
     <br />
 
-    <label>Paddle is moving: @Active.Paddles.First().IsMoving()</label><br />
-    <label>Ball speed: @Balls.FirstOrDefault().Speed</label><br />
+    <label>Paddle is moving: @Game.Active.Paddles.First().IsMoving()</label><br />
+    <label>Ball speed: @Game.Balls.FirstOrDefault().Speed</label><br />
     <button class="btn btn-primary" @onclick="@BtnStart" autofocus>@StartPauseButtonLabel</button>
 
 
@@ -41,7 +41,9 @@
     int NumberOfPlayers = 0;
 
     internal string LastKeyPress;
-   
+
+
+
 
     public void BtnStart()
     {
@@ -66,7 +68,7 @@
             {
                 if (!IsPaused)
                 {
-                    foreach (var ball in @Balls)
+                    foreach (var ball in @Game.Balls)
                     {
 
 
@@ -94,14 +96,14 @@
                         {
                             var pos = nextPos.X;
 
-                            if (pos >= Width)
+                            if (pos >= Game.Width)
                             {
                                 // Hit Right Wall
                                 pos = ball.CurrentPosition.X - ball.Speed;
                                 //IncrmentScore();
 
                             }
-                            else if (Active.Paddles.First().IsPaddleNew(pos, ball.CurrentPosition.Y))
+                            else if (Game.Active.Paddles.First().IsPaddleNew(pos, ball.CurrentPosition.Y))
                             {
                                 ChangeBallSpeed(ball);
 
@@ -120,7 +122,7 @@
                                 pos = ball.CurrentPosition.X + ball.Speed;
                                 //IncrmentScore();
                             }
-                            else if (Active.Paddles.First().IsPaddleNew(pos, ball.CurrentPosition.Y))
+                            else if (Game.Active.Paddles.First().IsPaddleNew(pos, ball.CurrentPosition.Y))
                             {
                                 ChangeBallSpeed(ball);
                                 pos = ball.CurrentPosition.X - ball.Speed;
@@ -140,9 +142,9 @@
                         {
                             var pos = nextPos.Y;
 
-                            if (pos >= Height)  // Ball hit bottom
+                            if (pos >= Game.Height)  // Ball hit bottom
                                 pos = ball.CurrentPosition.Y - ball.Speed;
-                            else if (Active.Paddles.First().IsPaddleNew(ball.CurrentPosition.X, pos)) // Ball Hit Paddle
+                            else if (Game.Active.Paddles.First().IsPaddleNew(ball.CurrentPosition.X, pos)) // Ball Hit Paddle
                             {
                                 ChangeBallSpeed(ball);
 
@@ -157,7 +159,7 @@
 
                             if (pos <= 0)  // Ball hit top
                                 pos = ball.CurrentPosition.Y + ball.Speed;
-                            else if (Active.Paddles.First().IsPaddleNew(ball.CurrentPosition.X, pos)) // Ball hit paddle
+                            else if (Game.Active.Paddles.First().IsPaddleNew(ball.CurrentPosition.X, pos)) // Ball hit paddle
                             {
                                 ChangeBallSpeed(ball);
                                 pos = ball.CurrentPosition.Y - ball.Speed;
@@ -207,7 +209,7 @@
     void ChangeBallSpeed(Ball ball)
     {
 
-        if (Active.Paddles.First().IsMoving())
+        if (Game.Active.Paddles.First().IsMoving())
         {
             if (ball.Speed < 10)
                 ball.Speed++;
@@ -220,16 +222,16 @@
     {
 
         // Find lowest
-        var lowest = Balls.OrderByDescending(y => y.CurrentPosition.Y).First();
+        var lowest = Game.Balls.OrderByDescending(y => y.CurrentPosition.Y).First();
 
         var pos = lowest.CurrentPosition.X;
-        var start = Active.Paddles.First().CurrentPosition.X;
-        var end = Active.Paddles.First().CurrentPosition.X + Active.Paddles.First().Width;
+        var start = Game.Active.Paddles.First().CurrentPosition.X;
+        var end = Game.Active.Paddles.First().CurrentPosition.X + Game.Active.Paddles.First().Width;
 
         if (pos < start)
-            MovePaddleLeft();
+            Game.MovePaddleLeft();
         else if (pos > end)
-            MovePaddleRight();
+            Game.MovePaddleRight();
 
     }
 
@@ -246,8 +248,7 @@
         await KeyHandler(args);
         return true;
     }
-    protected async Task<bool>
-        KeyHandler(UIKeyboardEventArgs args)
+    protected async Task<bool> KeyHandler(UIKeyboardEventArgs args)
     {
         try
         {
@@ -257,22 +258,22 @@
                 case "ArrowLeft":
                 case "A":
                 case "a":
-                    MovePaddleLeft();
+                    Game.MovePaddleLeft();
                     break;
                 case "ArrowRight":
                 case "D":
                 case "d":
-                    MovePaddleRight();
+                    Game.MovePaddleRight();
                     break;
                 case "ArrowUp":
                 case "W":
                 case "w":
-                    MovePaddleUp();
+                    Game.MovePaddleUp();
                     break;
                 case "ArrowDown":
                 case "S":
                 case "s":
-                    MovePaddleDown();
+                    Game.MovePaddleDown();
                     break;
                 default:
                     Console.WriteLine($"Key {args.Key} Code {args.Code}");
@@ -290,7 +291,7 @@
             Console.WriteLine(ex);
             throw;
         }
-        return false;
+
     }
 
 }

@@ -6,29 +6,51 @@
 
 <p>A single player proof of consent example of Bouncing a ball off of a wall using a paddle with Blazor.</p>
 
-<GamePannel Width="@Game.Width" Height="@Game.Height" Players="@Game.Players" Balls="@Game.Balls" Active="@Game.Active"></GamePannel>
 
+<GamePannel Game="@Game"></GamePannel>
 
 @code {
 
-    GamePannel Game;
+    GameModel Game;
 
 
     protected override async Task OnInitAsync()
     {
-        Game = new GamePannel();
+        Game = new GameModel();
         Game.Height = 400;
         Game.Width = 600;
         Game.AddBall(5, 5, "fill:rgb(255,0,0);stroke-width:1;stroke:rgb(0,0,0)", new Point(50, 200), new Point(50 + 5, 200 + 5), new Point(55 - 5, 200 - 5));
 
-        Game.Players = new List<Player>();
-        var playerOnePaddle = new Paddle() { Height = 25, Width = 100, Speed = 10, Style = "fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,0)", CurrentPosition = new Point(200, 350), PaddleMovment = PaddleMovment.PaddleMovmentAll() };
-        var PlayerOneScoreOptions = new PaddleOptons(true, false, false, false);
-        var playerOne = Player.InitSinglePlayer(playerOnePaddle, PlayerOneScoreOptions, false);
+        int myPaddleHeight = 25;
+        int myPaddleWidth = 100;
+        int myPaddleSpeed = 10;
 
-        Game.Players = new List<Player> { playerOne };
 
-        Game.Active = playerOne;
+        Game.Players = new Dictionary<string, Player>()
+{
+            { "playerone", new Player()
+                            {
+                                PlayerScore = new PaddleOptons(true, false, false, false),
+                                Score = 0,
+                                Paddles = new List<Paddle>()
+                {
+                                    new Paddle()
+                                    {
+                                        Height = myPaddleHeight,
+                                        Width = myPaddleWidth,
+                                        Speed = myPaddleSpeed,
+                                        Style = "fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,0)",
+                                        CurrentPosition = new Point(200, 350),
+                                        PaddleMovment = PaddleMovment.PaddleMovmentAll()
+                                     }
+                                }
+                            }
+            }
+        };
+
+
+
+        Game.Active = Game.Players.First().Value;
 
     }
 }

@@ -9,46 +9,99 @@
 <p>A pong style game created in Balzor</p>
 
 
-<GamePannel Width="@Game.Width" Height="@Game.Height" Balls="@Game.Balls" Active="@Game.Active" StartGameParentMethod="@btnStartGame"></GamePannel>
+<GamePannel Game="@Game" StartGameParentMethod = "@btnStartGame"></GamePannel>
 
 @code {
-GamePannel Game;
-int myPaddleHeight = 100;
-int myPaddleWidth = 20;
-int myPaddleSpeed = 10;
+    GameModel Game;
+    int myPaddleHeight = 100;
+    int myPaddleWidth = 20;
+    int myPaddleSpeed = 10;
 
-protected override async Task OnInitAsync()
+    protected override async Task OnInitAsync()
+    {
+        Game = new GameModel();
+        Game.Height = 400;
+        Game.Width = 600;
+        NewGame();
+    }
+
+    private void NewGame()
+    {
+        ResetBall();
+
+
+        Game.Players = new Dictionary<string, Player>()
 {
-    Game = new GamePannel();
-    Game.Height = 400;
-    Game.Width = 600;
+            { "playerleft", new Player()
+                            {
+                                IsHuman = true,
+                                PlayerScore = new PaddleOptons(true, false, false, false),
+                                Score = 0,
+                                Paddles = new List<Paddle>()
+                    {
+                                    new Paddle()
+                                    {
+                                        Height = myPaddleHeight,
+                                        Width = myPaddleWidth,
+                                        Speed = myPaddleSpeed,
+                                        Style = "fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,0)",
+                                        CurrentPosition = new Point(20, Game.Height / 2 - myPaddleHeight / 2),
+                                        PaddleMovment = PaddleMovment.PaddleMovmentAll()
+                                     }
+                                }
+                            }
+            },
+            { "playerright", new Player()
+                            {
+                                IsHuman = false,
+                                PlayerScore = new PaddleOptons(true, false, false, false),
+                                Score = 0,
+                                Paddles = new List<Paddle>()
+                    {
+                                    new Paddle()
+                                    {
+                                        Height = myPaddleHeight,
+                                        Width = myPaddleWidth,
+                                        Speed = myPaddleSpeed,
+                                        Style = "fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,0)",
+                                        CurrentPosition = new Point(550, Game.Height / 2 - myPaddleHeight / 2),
+                                        PaddleMovment = PaddleMovment.PaddleMovmentAll()
+                                    }
+                                }
+                            }
+            }
+        };
 
-    NewGame();
-}
 
-private void NewGame()
-{
 
-    //Game.Balls = new List<Ball>();
-    //var Paddles = new List<Paddle>();
-    //Paddles.AddPaddle(myPaddleHeight, myPaddleWidth, myPaddleSpeed, "fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,0)", new Point(20, Game.Height / 2 - myPaddleHeight / 2), PaddleMovment.PaddleMovmentVirtical(), true);
-
-    //Game.AddPaddle(myPaddleHeight, myPaddleWidth, myPaddleSpeed, "fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,0)", new Point(550, Game.Height / 2 - myPaddleHeight / 2), PaddleMovment.PaddleMovmentVirtical(), true);
-
-    //Game.AddBall(5, 5, "fill:rgb(255,0,0);stroke-width:1;stroke:rgb(0,0,0)", new Point(50, 200), new Point(50 + 5, 200 + 5), new Point(55 - 5, 200 - 5));
-
-    //Game.Balls.First().HideBall();
-}
-
-private void btnStartGame()
-{
-
-    int i = 1;
-
-}
+        Game.Active = Game.Players.First().Value;
 
 
 
+        Game.Balls = new List<Ball>();
+        //var Paddles = new List<Paddle>();
+        //Paddles.AddPaddle(myPaddleHeight, myPaddleWidth, myPaddleSpeed, "fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,0)", new Point(20, Game.Height / 2 - myPaddleHeight / 2), PaddleMovment.PaddleMovmentVirtical(), true);
+
+        //Game.AddPaddle(myPaddleHeight, myPaddleWidth, myPaddleSpeed, "fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,0)", new Point(550, Game.Height / 2 - myPaddleHeight / 2), PaddleMovment.PaddleMovmentVirtical(), true);
+
+
+
+
+    }
+
+    private void ResetBall()
+    {
+        Game.Balls = new List<Ball>
+        ();
+        Game.AddBall(5, 5, "fill:rgb(255,0,0);stroke-width:1;stroke:rgb(0,0,0)", new Point(50, 200), new Point(50 + 5, 200 + 5), new Point(55 - 5, 200 - 5));
+        Game.Balls.First().HideBall();
+
+    }
+
+
+    private void btnStartGame()
+    {
+    }
 
 
 }

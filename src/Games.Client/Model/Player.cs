@@ -9,6 +9,7 @@ namespace Games.Client.Model
 {
     public class Player : ComponentBase
     {
+        
         [Parameter]
         public PaddleOptons PlayerScore { get; set; }
 
