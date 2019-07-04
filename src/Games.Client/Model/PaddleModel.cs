@@ -125,15 +125,8 @@ namespace Games.Client.Model
             Style = "fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,0)";
         }
 
-        public bool IsPaddleNew(int x, int y)
+        public bool IsPaddleNew(int x, int y)  //TODO change this to point
         {
-            //var points = GetAllPoints();
-
-            //if (points.Any(p => p.X.Equals(x) && p.Y.Equals(y)))
-            //    return true;
-
-            //return false;
-
             var myObject = CurrentPosition;
             var width = Width;
             var height = Height;

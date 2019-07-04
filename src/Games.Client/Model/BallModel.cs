@@ -80,9 +80,7 @@ namespace Games.Client.Model
 
         public BallModel()
         {
-            Style = "fill:rgb(255,0,0);stroke-width:1;stroke:rgb(0,0,0)";
             Radius = 5;
-
         }
 
         public void HideBall()

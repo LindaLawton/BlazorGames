@@ -16,7 +16,7 @@
 
         @foreach (var ball in @Game.Balls)  //todo: figuer out why this pukes on list of 0
         {
-            <Ball CurrentPosition="@ball.CurrentPosition"></Ball>
+            <Ball CurrentPosition="@ball.CurrentPosition" Radius="@ball.Radius" Style="@ball.Style"></Ball>
         }
 
     </svg>
